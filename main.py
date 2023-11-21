@@ -2,25 +2,34 @@ from cProfile import label
 from tkinter import *
 
 window = Tk()
-title_of_gui = Label(
-    text='To Do List \nDouble click to remove items')
+
 user_input = Entry(window, text='o ')
-title_of_gui.pack()
+
 user_input.pack(pady=4, padx=4)
 items_in_list = Listbox(window, height=22, width=30)
 items_in_list.pack(pady=4, padx=4)
+remove_btn = Button(window, text="Delete selected item")
+remove_btn.pack()
+
+
+def init():
+    with open('task.txt', 'r') as get_values:
+        items = get_values.readlines()
+        for i in items:
+            items_in_list.insert(END, i)
 
 
 def save_to_file(what_to_save):
     with open('task.txt', 'a') as save_file:
-        save_file.write(f'\n{what_to_save}')
+        save_file.write(f'{what_to_save}\n')
 
 
 def add_to_do(event):
     to_do_string = user_input.get()
-    items_in_list.insert(END, to_do_string)
-    user_input.delete(0, END)
-    save_to_file(to_do_string)
+    if len(to_do_string) > 0:
+        items_in_list.insert(END, to_do_string)
+        save_to_file(to_do_string)
+        user_input.delete(0, END)
 
 
 def remove_to_do(event):
@@ -30,16 +39,15 @@ def remove_to_do(event):
 
         file_remove_output.truncate()
         for line in lines:
-            if items_in_list.get(ACTIVE) == line[:-2]:
+            if items_in_list.get(ACTIVE) == line:
                 lines.remove(line)
             file_remove_output.write(line)
 
-        file_remove_output.close()
 
-
-items_in_list.bind('<Double-Button-1>', remove_to_do)
+init()
+remove_btn.bind('<Button-1>', remove_to_do)
 window.bind('<Return>', add_to_do)
 window.title('To Do List')
-window.geometry('250x400+10+10')
+window.geometry('250x440+10+10')
 window['background'] = '#856ff8'
 window.mainloop()
